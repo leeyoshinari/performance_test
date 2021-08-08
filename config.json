@@ -1,0 +1,82 @@
+[
+  {
+    "name": "百度首页",
+    "jmeter":
+    {
+      "thread": 1,
+      "roundUp": 1,
+      "duration": 600
+    },
+    "application": [
+        {
+          "name": "12020",
+          "ip": "127.0.0.1",
+          "port": "12020",
+          "disk": "sda"
+        },
+        {
+          "name": "12021",
+          "ip": "127.0.0.1",
+          "port": "12021",
+          "disk": "sdb"
+        }
+      ],
+    "database":
+    {
+      "name": "database",
+      "ip": "127.0.0.1",
+      "disk": "sda"
+    },
+    "others": [
+      {
+        "name": "FastDFS",
+        "ip": "127.0.0.1",
+        "port": "",
+        "disk": "sda"
+      },
+      {
+        "name": "Redis",
+        "ip": "127.0.0.1",
+        "port": "6379",
+        "disk": "sdb"
+      }
+    ]
+  },
+  {
+    "name": "百度首页",
+    "application": [
+        {
+          "name": "12020",
+          "ip": "127.0.0.1",
+          "port": "12020",
+          "disk": "sda"
+        },
+        {
+          "name": "12021",
+          "ip": "127.0.0.1",
+          "port": "12021",
+          "disk": "sdb"
+        }
+      ],
+    "database":
+    {
+      "name": "database",
+      "ip": "127.0.0.1",
+      "disk": "sda"
+    },
+    "others": [
+      {
+        "name": "FastDFS",
+        "ip": "127.0.0.1",
+        "port": "",
+        "disk": "sda"
+      },
+      {
+        "name": "Redis",
+        "ip": "127.0.0.1",
+        "port": "6379",
+        "disk": "sdb"
+      }
+    ]
+  }
+]

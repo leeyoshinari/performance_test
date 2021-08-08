@@ -1,0 +1,225 @@
+{% extends "template.html" %}
+
+{% block page_content %}
+<div class="page-header">
+    <h3 style="text-align: center;">性能测试场景列表</h3>
+    <button id="Runing" style="width: 11%; float: right; margin-bottom: 2%;">立即执行</button>
+    <table width="100%" border="1" cellspacing="0" cellpadding="6" align="center" id="monitor" style="table-layout: fixed;">
+        <tr style="align: center; margin: auto; background-color: #99CCFF">
+            <th width=10% style="text-align: center; display: none">ID</th>
+            <th width=10% style="text-align: center;">Name</th>
+            <th width=11% style="text-align: center;">JMeter</th>
+            <th width=15% style="text-align: center;">Application</th>
+            <th width=10% style="text-align: center;">Database</th>
+            <th width=24% style="text-align: center;">Others</th>
+            <th width=20% style="text-align: center;">Manager</th>
+        </tr>
+        {% for data in datas %}
+            <tr>
+                <td align="center" style="white-space: nowrap;text-overflow: ellipsis; overflow: hidden;" title="{{ data[0] }}">{{ data[0] }}</td>
+                <td style="white-space: nowrap;text-overflow: ellipsis; overflow: hidden;" title="{{ data[1] }}">{{ data[1] }}</td>
+                <td style="white-space: nowrap;text-overflow: ellipsis; overflow: hidden;" title="{{ data[2] }}">{{ data[2] }}</td>
+                <td style="white-space: nowrap;text-overflow: ellipsis; overflow: hidden;" title="{{ data[3] }}">{{ data[3] }}</td>
+                <td align="center">{{ data[4]}}</td>
+                <td style="white-space: nowrap;text-overflow: ellipsis; overflow: hidden;" title="{{ data[5] }}">{{ data[5]}}</td>
+                <td align="center">
+                    {% if data[7] > 0 %}
+                    <input name="{{ data[0] }}" type="radio" value="1" checked onclick="set_is_run('{{ data[0] }}', 1)">启用
+                    <input name="{{ data[0] }}" type="radio" value="0" onclick="set_is_run('{{ data[0] }}', 0)">禁用
+                    {% else %}
+                    <input name="{{ data[0] }}" type="radio" value="1" onclick="set_is_run('{{ data[0] }}', 1)">启用
+                    <input name="{{ data[0] }}" type="radio" value="0" checked onclick="set_is_run('{{ data[0] }}', 0)">禁用
+                    {% endif %}
+                    <a href="#" onclick="edit('edit/{{ data[0] }}')" style="margin-left: 2%;">编辑</a>
+                    <a href="#" onclick="openResult('delete/{{ data[0] }}')" style="margin-left: 2%;">删除</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
+{% block edit_content %}
+<div class="page-header">
+    <h3 style="text-align: center;">添加/编辑测试场景</h3>
+    <div style="margin-left: 3%; margin-right: 3%">
+        <div style="max-width: 100%; margin-top: 3%;">
+            <label id="ID_label" style="width: 15%; text-align: right; display: none">ID: </label>
+            <input type="text" id="ID" value="" style="margin-left: 3%; width: 80%; display: none" readonly="readonly">
+        </div>
+        <div style="max-width: 100%; margin-top: 3%;">
+            <label style="width: 15%; text-align: right;">Name: </label>
+            <input type="text" id="name" placeholder="Name of test case" style="margin-left: 3%; width: 80%;">
+        </div>
+        <div style="max-width: 100%; margin-top: 3%;">
+            <label style="width: 15%; text-align: right; float:left;">JMeter: </label>
+            <textarea id="jmeter" placeholder="Parameters of JMeter" style="margin-left: 3%; width: 80%;" rows="6"></textarea>
+        </div>
+        <div style="max-width: 100%; margin-top: 3%;">
+            <label style="width: 15%; text-align: right; float:left;">Application: </label>
+            <textarea id="application" placeholder="Configuration of Monitor of Tested-System" style="margin-left: 3%; width: 80%;" rows="8"></textarea>
+        </div>
+        <div style="max-width: 100%; margin-top: 3%;">
+            <label style="width: 15%; text-align: right; float: left;">Database: </label>
+            <textarea id="database" placeholder="Configuration of Monitor of Database" style="margin-left: 3%; width: 80%;" rows="6"></textarea>
+        </div>
+        <div style="max-width: 100%; margin-top: 3%;">
+            <label style="width: 15%; text-align: right; float: left;">Others: </label>
+            <textarea id="others" placeholder="Configuration of Monitor of others tools" style="margin-left: 3%; width: 80%;" rows="8"></textarea>
+        </div>
+        <div style="text-align: center; margin-top: 5%;">
+            <button id="Save" style="width: 30%; display: ">保存</button>
+            <button id="Update" style="width: 30%; display: none">更新</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block myjs %}
+<script type="text/javascript">
+    window.onload = function() {
+        let height = window.outerHeight;
+        let width = window.outerWidth;
+    }
+    $("#Runing").click(function () {
+        $.ajax ({
+            type: 'get',
+            url: 'reload',
+            datatype: 'json',
+            success: function(data) {
+                if(data['code'] === 0) {
+                    console.error(data['msg']);
+                    $.Toast(data['msg'], 'error');
+                } else {
+                    $.Toast(data['msg'], 'success');
+                }
+            }
+        })
+    });
+    $("#Save").click(function () {
+        let name = document.getElementById('name').value;
+        let jmeter = document.getElementById('jmeter').value;
+        let application = document.getElementById('application').value;
+        let database = document.getElementById('database').value;
+        let others = document.getElementById('others').value;
+        let postdata = {
+            name: name,
+            jmeter: jmeter,
+            application: application,
+            database: database,
+            others: others,
+        };
+        $.ajax({
+            type: 'post',
+            url: 'save',
+            data: JSON.stringify(postdata),
+            datatype: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if(data['code'] === 0) {
+                    console.error(data['msg']);
+                    $.Toast(data['msg'], 'error');
+                } else {
+                    $.Toast(data['msg'], 'success');
+                    window.location.href="";
+                }
+            },
+        });
+    });
+    $("#Update").click(function () {
+        let ID = document.getElementById('ID').value;
+        let name = document.getElementById('name').value;
+        let jmeter = document.getElementById('jmeter').value;
+        let application = document.getElementById('application').value;
+        let database = document.getElementById('database').value;
+        let others = document.getElementById('others').value;
+        let postdata = {
+            ID: ID,
+            name: name,
+            jmeter: jmeter,
+            application: application,
+            database: database,
+            others: others,
+        };
+        $.ajax({
+            type: 'post',
+            url: 'update',
+            data: postdata,
+            datatype: 'json',
+            success: function (data) {
+                if(data['code'] === 0) {
+                    console.error(data['msg']);
+                    $.Toast(data['msg'], 'error');
+                } else {
+                    $.Toast(data['msg'], 'success');
+                    window.location.href="";
+                }
+            },
+        });
+    });
+    function set_is_run(Id, isRun){
+        let post_data = {
+            Id: Id,
+            isRun: isRun,
+        }
+        $.ajax({
+            type: 'post',
+            url: 'isRun',
+            data: post_data,
+            datatype: 'json',
+            success: function(data){
+                if(data['code'] === 0) {
+                    console.error(data['msg']);
+                    $.Toast(data['msg'], 'error');
+                } else {
+                    $.Toast(data['msg'], 'success');
+                    window.location.href="";
+                }
+            }
+        })
+    }
+    function openResult(del_url){
+        let r = confirm("亲，您确定删除测试场景吗？")
+        if (r === true) {
+            $.ajax({
+                type: 'get',
+                url: del_url,
+                datatype: 'json',
+                success: function (data) {
+                    if (data['code'] === 0) {
+                        console.error(data['msg']);
+                        $.Toast(data['msg'], 'error');
+                    } else {
+                        $.Toast(data['msg'], 'success');
+                        window.location.href="";
+                    }
+                }
+            })
+        } else {}
+    }
+    function edit(edit_url){
+        $.ajax({
+            type: 'get',
+            url: edit_url,
+            datatype: 'json',
+            success: function (data) {
+                if (data['code'] === 0) {
+                    console.error(data['msg']);
+                    $.Toast(data['msg'], 'error');
+                } else {
+                    $.Toast(data['msg'], 'success');
+                    document.getElementById('ID_label').style.display = '';
+                    document.getElementById('ID').style.display = '';
+                    document.getElementById('ID').value = data['data'][0];
+                    document.getElementById('name').value = data['data'][1];
+                    document.getElementById('domain_name').value = data['data'][2];
+                    document.getElementById('url_path').value = data['data'][3];
+                    document.getElementById('status_code').value = data['data'][4];
+                    document.getElementById('response').value = data['data'][5];
+                    document.getElementById('is_file').value = data['data'][6];
+                    document.getElementById('Save').style.display = 'none';
+                    document.getElementById('Update').style.display = '';
+                }
+            }
+        })
+    }
+</script>
+{% endblock %}
